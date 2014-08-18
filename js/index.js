@@ -1,6 +1,5 @@
 var GP = GP || {};
 
-
 (function() {
 
     'use strict';
@@ -86,9 +85,11 @@ var GP = GP || {};
 
             this.initLight();
 
-            this.initObject();
+            this.itemManager = new GP.ItemManager();
 
             this.initEvents();
+
+            window.setTimeout(this.initObject(), 0);
 
         },
 
@@ -173,6 +174,9 @@ var GP = GP || {};
 
                 this.os.add(o);
 
+
+                this.itemManager.addItem(new GP.Item(o));
+
             }
 
         },
@@ -227,6 +231,8 @@ var GP = GP || {};
                 this.onCanvasResize(w, h);
 
             }
+
+            this.itemManager.update(time);
         },
 
         render: function() {
@@ -301,56 +307,6 @@ var GP = GP || {};
         },
     };
 
-
-
-    GP.Boom = function(ball) {
-
-        if (!ball) throw new Error("A Boom needs a ball!");
-
-        this.ball = ball;
-        this.startTime = Date.now();
-        this.lengthTime = 1000 * 2;
-        this.endTime = this.startTime + this.lengthTime;
-
-        this.radius = ball.geometry.radius;
-        this.radiusEnd = ball.geometry.radius * (Math.exp(3) / 2);
-
-        this.color = '#' + (ball.material.ambient || ball.material.color).getHexString();
-        this.opacity = 1;
-    };
-
-    GP.Boom.prototype = {
-        constructor: GP.Boom,
-
-        ball: null, // mesh object source
-        startTime: null, // date source
-        lengthTime: null,
-        endTime: null, // date death
-
-        radius: null, // current radius of the orb
-        radiusEnd: null,
-
-        color: null,
-        opacity: null,
-
-        isDead: false,
-
-        update: function update(time) {
-
-            var x = 3 - (time - this.startTime) / (this.lengthTime) * 3;
-            if (x < 0) x = 0;
-
-            var animFactor = (Math.exp(x) / 2) - 0.5;
-
-            this.radius = this.radiusEnd - this.ball.geometry.radius * animFactor;
-
-            this.opacity = 0.5 * (animFactor / 9.5);
-
-            if (Date.now() > this.endTime) {
-                this.isDead = true;
-            }
-        }
-    };
 
 
 })();
